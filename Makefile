@@ -12,7 +12,7 @@ LDFLAGS := -m i386pe -T linker.ld
 
 # Diretórios
 SRCDIR   := src
-BUILDDIR := build
+BUILDDIR := .build
 
 # --- BUSCA DE ARQUIVOS ---
 # Listamos manualmente ou via wildcard as pastas que você criou

@@ -50,7 +50,7 @@ make clean  # limpa compilação
 │   │   └── terminal.c    # Lógica do terminal
 │   └── lib/
 │       └── string.c      # Implementação de strings
-└── build/                # Objetos (.o) e binário final (gerado pelo Make)
+└── .build/                # Objetos (.o) e binário final (gerado pelo Make)
 ```
 
 ## Como Contribuir
