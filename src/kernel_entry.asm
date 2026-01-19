@@ -1,4 +1,7 @@
 [bits 32]
 [extern _kernel_main]
-call _kernel_main
-jmp $
+
+global __start
+__start:
+    call _kernel_main
+    jmp $

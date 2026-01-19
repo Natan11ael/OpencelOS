@@ -1,54 +1,110 @@
 // src/kernel.c
+//
+// -- Imports Sorces
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+//
+// -- VGA Managers
+//
+// text colors hardware constant
+enum vga_color {  
+	VGA_COLOR_BLACK = 0 ,  
+	VGA_COLOR_AZUL = 1 ,  
+	VGA_COLOR_GREEN = 2 ,  
+	VGA_COLOR_CYAN = 3 ,  
+	VGA_COLOR_RED = 4 ,  
+	VGA_COLOR_MAGENTA = 5 ,  
+	VGA_COLOR_BROWN = 6 ,  
+	VGA_COLOR_LIGHT_GREY = 7 ,  
+	VGA_COLOR_DARK_GREY = 8 ,  
+	VGA_COLOR_LIGHT_BLUE = 9 ,  
+	VGA_COLOR_LIGHT_GREEN = 10 ,  
+	VGA_COLOR_LIGHT_CYAN = 11 ,  
+	VGA_COLOR_LIGHT_RED = 12 ,  
+	VGA_COLOR_LIGHT_MAGENTA = 13 ,  
+	VGA_COLOR_LIGHT_BROWN = 14 ,  
+	VGA_COLOR_WHITE = 15 ,  
+};
+//
+static inline uint8_t entry_color(enum vga_color fg, enum vga_color bg) {
+	return fg | bg << 4;
+}
+//
+static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
+	return (uint16_t) uc | (uint16_t) color << 8;
+}
+//
+size_t strlen(const char* str) {
+	size_t len = 0;
+	while (str[len]) len++;
+	return len;
+}
+//
+// -- Terminal Managers
+//
+// defines
+#define VGA_WIDTH   80
+#define VGA_HEIGHT  25
+#define VGA_MEMORY  0xB8000 
+//
+// datas
+size_t terminal_row;
+size_t terminal_column;
+uint8_t terminal_color;
+uint16_t* terminal_buffer;
+//
+// functions
+void terminal_init(void) {
+	terminal_row = 0;
+	terminal_column = 0;
+	terminal_color = entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    terminal_buffer = (uint16_t*)VGA_MEMORY; 
+	
+	for (size_t i = 0; i < VGA_HEIGHT * VGA_WIDTH; i++) {
+		const size_t index = i;
+		terminal_buffer[index] = vga_entry(' ', terminal_color);
+	}
+}
+//
+void terminal_setcolor(uint8_t color) {
+	terminal_color = color;
+}
+//
+void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) {
+	const size_t index = y * VGA_WIDTH + x;
+	terminal_buffer[index] = vga_entry(c, color);
+}
+//
+void terminal_putchar(char c) {
+    if (c == '\n') {
+        terminal_column = 0;
+        if (++terminal_row == VGA_HEIGHT) terminal_row = 0;
+        return;
+    }
+
+	terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
+	if (++terminal_column == VGA_WIDTH) {
+		terminal_column = 0;
+		if (++terminal_row == VGA_HEIGHT) terminal_row = 0;
+	}
+}
+//
+void terminal_write(const char* data, size_t size) {
+	for (size_t i = 0; i < size; i++) terminal_putchar(data[i]);
+}
+//
+void terminal_writestring(const char* data) {
+	terminal_write(data, strlen(data));
+}
+//
+// -- Main kernel execution
 void kernel_main() {
-    volatile char* video_memory = (volatile char*) 0xb8000;
-    
-    // H - Azul (0x01)
-    video_memory[0] = 'H';
-    video_memory[1] = 0x01;
+    /* Initialize terminal interface */
+	terminal_init();
 
-    // e - Verde (0x02)
-    video_memory[2] = 'e';
-    video_memory[3] = 0x02;
-
-    // l - Ciano (0x03)
-    video_memory[4] = 'l';
-    video_memory[5] = 0x03;
-
-    // l - Vermelho (0x04)
-    video_memory[6] = 'l';
-    video_memory[7] = 0x04;
-
-    // o - Magenta (0x05)
-    video_memory[8] = 'o';
-    video_memory[9] = 0x05;
-
-    // Espaço - (0x07 cinza padrão)
-    video_memory[10] = ' ';
-    video_memory[11] = 0x07;
-
-    // W - Marrom/Laranja (0x06)
-    video_memory[12] = 'W';
-    video_memory[13] = 0x06;
-
-    // o - Cinza Claro (0x07)
-    video_memory[14] = 'o';
-    video_memory[15] = 0x07;
-
-    // r - Cinza Escuro (0x08)
-    video_memory[16] = 'r';
-    video_memory[17] = 0x08;
-
-    // l - Azul Claro (0x09)
-    video_memory[18] = 'l';
-    video_memory[19] = 0x09;
-
-    // d - Verde Claro (0x0A)
-    video_memory[20] = 'd';
-    video_memory[21] = 0x0A;
-
-    // ! - Vermelho Claro (0x0C)
-    video_memory[22] = '!';
-    video_memory[23] = 0x0C;
+	/* Newline support is left as an exercise. */
+	terminal_writestring("Hello, kernel World!\n");
 
     while(1);
 }

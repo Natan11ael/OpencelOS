@@ -9,16 +9,17 @@ nasm -f win32 src/kernel_entry.asm -o build/kernel_entry.o
 
 :: 2. Compila o Kernel C
 echo [build] Compilando Kernel C...
-gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -c src/kernel.c -o build/kernel.o
+gcc -m32 -ffreestanding -fno-pie -fno-stack-protector -c src/*.c
+move *.o build/
 
 :: 3. Linkagem (A ORDEM IMPORTA!)
 :: Note que kernel_entry.o vem ANTES de kernel.o
 echo [build] Linkando Kernel...
-ld -m i386pe -Ttext 0x1000 -o build/kernel.tmp build/kernel_entry.o build/kernel.o
+ld -m i386pe -T src/linker.ld -o build/kernel.tmp build/kernel_entry.o build/*.o
 
 :: 4. Extração Binária
 echo [build] Gerando Binario do Kernel...
-objcopy -O binary -j .text -j .data build/kernel.tmp build/kernel.bin
+objcopy -O binary build/kernel.tmp build/kernel.bin
 
 :: 5. Compila o Bootloader
 echo [build] Compilando Bootloader ASM...
