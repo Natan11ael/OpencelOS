@@ -97,6 +97,25 @@ void terminal_write(const char* data, size_t size) {
 void terminal_writestring(const char* data) {
 	terminal_write(data, strlen(data));
 }
+
+/*
+// path: include/drivers/vga.h
+//
+// imports resources
+#include <stdint.h>  	// Para uint8_t e uint16_t
+#include <stddef.h>  	// Para size_t
+//
+//
+typedef struct {
+    size_t row;			//
+    size_t column;		//
+    uint8_t color;		//
+    uint16_t* buffer;	//
+} terminal_t;
+//
+static terminal_t main_terminal;
+*/
+
 //
 // -- Main kernel execution
 void kernel_main() {
