@@ -32,6 +32,27 @@ make run    # executa compilação
 make clean  # limpa compilação
 ```
 
+## Estrutura de pastas
+```bash
+/opencel-os
+├── Makefile              # Automação do build
+├── linker.ld             # Script de linkagem
+├── include/              # Arquivos de cabeçalho (.h)
+│   ├── drivers/
+│   │   ├── vga.h         # Definições de hardware
+│   │   └── terminal.h    # Interface do terminal
+│   └── lib/
+│       └── string.h      # Funções utilitárias
+├── src/                  # Código fonte (.c, .asm)
+│   ├── boot.asm          # Bootloader (se houver)
+│   ├── kernel.c          # Entrada principal
+│   ├── drivers/
+│   │   └── terminal.c    # Lógica do terminal
+│   └── lib/
+│       └── string.c      # Implementação de strings
+└── build/                # Objetos (.o) e binário final (gerado pelo Make)
+```
+
 ## Como Contribuir
 
 1. Faça um fork do projeto
